@@ -37,7 +37,7 @@ serve(async (req) => {
     if (!client_id) throw new Error("client_id required");
 
     const { data: client, error: cErr } = await supabase
-      .from("clients")
+      .from("hubspot_agent_clients")
       .select("id, team_id, hubspot_oauth_token, hubspot_portal_id")
       .eq("id", client_id)
       .single();
@@ -83,7 +83,7 @@ serve(async (req) => {
     }
 
     await supabase
-      .from("validation_checks")
+      .from("hubspot_agent_validation_checks")
       .delete()
       .eq("client_id", client_id);
 
@@ -96,7 +96,7 @@ serve(async (req) => {
     }));
 
     if (rows.length > 0) {
-      await supabase.from("validation_checks").insert(rows);
+      await supabase.from("hubspot_agent_validation_checks").insert(rows);
     }
 
     return new Response(JSON.stringify({ checks }), {

@@ -11,7 +11,7 @@ export default function Export() {
   useEffect(() => {
     if (!clientId) return;
     supabase
-      .from("clients")
+      .from("hubspot_agent_clients")
       .select("name")
       .eq("id", clientId)
       .single()

@@ -25,7 +25,7 @@ export function useWizardSession(clientId: string | undefined): UseWizardSession
     (async () => {
       try {
         const { data: client, error: cErr } = await supabase
-          .from("clients")
+          .from("hubspot_agent_clients")
           .select("id, name, team_id")
           .eq("id", clientId)
           .single();
@@ -34,7 +34,7 @@ export function useWizardSession(clientId: string | undefined): UseWizardSession
         setClientName(client.name);
 
         const { data: existing } = await supabase
-          .from("wizard_sessions")
+          .from("hubspot_agent_wizard_sessions")
           .select("*")
           .eq("client_id", clientId)
           .order("created_at", { ascending: false })
@@ -44,7 +44,7 @@ export function useWizardSession(clientId: string | undefined): UseWizardSession
         let session = existing;
         if (!session) {
           const { data: created, error: insErr } = await supabase
-            .from("wizard_sessions")
+            .from("hubspot_agent_wizard_sessions")
             .insert({
               client_id: clientId,
               team_id: client.team_id,

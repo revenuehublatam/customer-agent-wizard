@@ -24,14 +24,14 @@ export function ExportView() {
     if (!clientId) return;
     (async () => {
       const { data: c } = await supabase
-        .from("clients")
+        .from("hubspot_agent_clients")
         .select("*")
         .eq("id", clientId)
         .single();
       if (c) setClient(c as unknown as Client);
 
       const { data: sessions } = await supabase
-        .from("wizard_sessions")
+        .from("hubspot_agent_wizard_sessions")
         .select("id")
         .eq("client_id", clientId)
         .order("created_at", { ascending: false })
@@ -39,7 +39,7 @@ export function ExportView() {
       const sessionId = sessions?.[0]?.id;
       if (sessionId) {
         const { data: f } = await supabase
-          .from("generated_files")
+          .from("hubspot_agent_generated_files")
           .select("*")
           .eq("session_id", sessionId)
           .eq("approved", true);
@@ -47,7 +47,7 @@ export function ExportView() {
       }
 
       const { data: vc } = await supabase
-        .from("validation_checks")
+        .from("hubspot_agent_validation_checks")
         .select("*")
         .eq("client_id", clientId);
       if (vc) setChecks(vc as ValidationCheck[]);

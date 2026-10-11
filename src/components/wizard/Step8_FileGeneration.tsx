@@ -36,7 +36,7 @@ export function Step8_FileGeneration({ onBack }: Step8Props) {
   useEffect(() => {
     if (!sessionId) return;
     supabase
-      .from("generated_files")
+      .from("hubspot_agent_generated_files")
       .select("*")
       .eq("session_id", sessionId)
       .then(({ data }) => {
@@ -83,7 +83,7 @@ export function Step8_FileGeneration({ onBack }: Step8Props) {
 
   const handleApprove = async (file: GeneratedFile) => {
     await supabase
-      .from("generated_files")
+      .from("hubspot_agent_generated_files")
       .update({ approved: true, status: "approved" })
       .eq("id", file.id);
     upsertGeneratedFile({ ...file, approved: true, status: "approved" });
@@ -249,7 +249,7 @@ export function Step8_FileGeneration({ onBack }: Step8Props) {
                     { upsert: true, contentType: mime },
                   );
                 await supabase
-                  .from("generated_files")
+                  .from("hubspot_agent_generated_files")
                   .update({ preview: previewContent.slice(0, 800) })
                   .eq("id", previewFile.id);
                 toast({ title: "Cambios guardados" });

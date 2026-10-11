@@ -36,20 +36,20 @@ serve(async (req) => {
     }
 
     const { data: session, error: sErr } = await supabase
-      .from("wizard_sessions")
+      .from("hubspot_agent_wizard_sessions")
       .select("id, client_id, team_id, form_data, blueprint")
       .eq("id", session_id)
       .single();
     if (sErr || !session) throw new Error("session not found");
 
     const { data: client } = await supabase
-      .from("clients")
+      .from("hubspot_agent_clients")
       .select("name, industry, website_url, primary_product, channels, notion_id")
       .eq("id", session.client_id)
       .single();
 
     const { data: tpl, error: tErr } = await supabase
-      .from("prompt_templates")
+      .from("hubspot_agent_prompt_templates")
       .select("id, content, output_format, filename_pattern")
       .eq("id", prompt_template_id)
       .single();
@@ -107,7 +107,7 @@ serve(async (req) => {
     const preview = output.slice(0, 800);
 
     const { data: fileRow, error: fErr } = await supabase
-      .from("generated_files")
+      .from("hubspot_agent_generated_files")
       .upsert(
         {
           session_id,
@@ -126,7 +126,7 @@ serve(async (req) => {
 
     if (fErr) {
       const { data: inserted } = await supabase
-        .from("generated_files")
+        .from("hubspot_agent_generated_files")
         .insert({
           session_id,
           team_id: session.team_id,
@@ -142,7 +142,7 @@ serve(async (req) => {
       if (!inserted) throw new Error(fErr.message);
     }
 
-    await supabase.from("generation_logs").insert({
+    await supabase.from("hubspot_agent_generation_logs").insert({
       session_id,
       team_id: session.team_id,
       prompt_template_id,

@@ -1,6 +1,6 @@
 # Sistema de Prompts — Customer Agent Setup Wizard
 
-> Anexo del SPEC. Cada sección de este archivo corresponde a un row de la tabla `prompt_templates`.
+> Anexo del SPEC. Cada sección de este archivo corresponde a un row de la tabla `hubspot_agent_prompt_templates`.
 > Mantener este archivo en `/supabase/seed/prompts.md` y correr el seeder en el primer migrate.
 
 ---

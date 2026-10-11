@@ -7,23 +7,23 @@ create extension if not exists "uuid-ossp";
 -- Tables
 -- =========================================
 
-create table if not exists public.teams (
+create table if not exists public.hubspot_agent_teams (
   id uuid primary key default uuid_generate_v4(),
   name text not null,
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.user_profiles (
+create table if not exists public.hubspot_agent_profiles (
   id uuid primary key references auth.users(id) on delete cascade,
-  team_id uuid references public.teams(id) on delete set null,
+  team_id uuid references public.hubspot_agent_teams(id) on delete set null,
   full_name text,
   role text not null default 'member',
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.clients (
+create table if not exists public.hubspot_agent_clients (
   id uuid primary key default uuid_generate_v4(),
-  team_id uuid not null references public.teams(id) on delete cascade,
+  team_id uuid not null references public.hubspot_agent_teams(id) on delete cascade,
   name text not null,
   industry text,
   website_url text,
@@ -37,10 +37,10 @@ create table if not exists public.clients (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists public.wizard_sessions (
+create table if not exists public.hubspot_agent_wizard_sessions (
   id uuid primary key default uuid_generate_v4(),
-  client_id uuid not null references public.clients(id) on delete cascade,
-  team_id uuid not null references public.teams(id) on delete cascade,
+  client_id uuid not null references public.hubspot_agent_clients(id) on delete cascade,
+  team_id uuid not null references public.hubspot_agent_teams(id) on delete cascade,
   current_step int not null default 1,
   form_data jsonb not null default '{}'::jsonb,
   blueprint jsonb,
@@ -49,10 +49,10 @@ create table if not exists public.wizard_sessions (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists public.generated_files (
+create table if not exists public.hubspot_agent_generated_files (
   id uuid primary key default uuid_generate_v4(),
-  session_id uuid not null references public.wizard_sessions(id) on delete cascade,
-  team_id uuid not null references public.teams(id) on delete cascade,
+  session_id uuid not null references public.hubspot_agent_wizard_sessions(id) on delete cascade,
+  team_id uuid not null references public.hubspot_agent_teams(id) on delete cascade,
   prompt_template_id text not null,
   filename text not null,
   output_format text not null,
@@ -64,7 +64,7 @@ create table if not exists public.generated_files (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists public.prompt_templates (
+create table if not exists public.hubspot_agent_prompt_templates (
   id text primary key,
   output_format text not null,
   filename_pattern text,
@@ -74,10 +74,10 @@ create table if not exists public.prompt_templates (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists public.generation_logs (
+create table if not exists public.hubspot_agent_generation_logs (
   id uuid primary key default uuid_generate_v4(),
-  session_id uuid references public.wizard_sessions(id) on delete cascade,
-  team_id uuid references public.teams(id) on delete cascade,
+  session_id uuid references public.hubspot_agent_wizard_sessions(id) on delete cascade,
+  team_id uuid references public.hubspot_agent_teams(id) on delete cascade,
   prompt_template_id text,
   model text,
   input_tokens int,
@@ -88,10 +88,10 @@ create table if not exists public.generation_logs (
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.validation_checks (
+create table if not exists public.hubspot_agent_validation_checks (
   id uuid primary key default uuid_generate_v4(),
-  client_id uuid not null references public.clients(id) on delete cascade,
-  team_id uuid not null references public.teams(id) on delete cascade,
+  client_id uuid not null references public.hubspot_agent_clients(id) on delete cascade,
+  team_id uuid not null references public.hubspot_agent_teams(id) on delete cascade,
   check_type text not null,
   status text not null,
   details jsonb,
@@ -102,13 +102,13 @@ create table if not exists public.validation_checks (
 -- Indexes
 -- =========================================
 
-create index if not exists idx_clients_team on public.clients(team_id);
-create index if not exists idx_sessions_client on public.wizard_sessions(client_id);
-create index if not exists idx_files_session on public.generated_files(session_id);
+create index if not exists idx_clients_team on public.hubspot_agent_clients(team_id);
+create index if not exists idx_sessions_client on public.hubspot_agent_wizard_sessions(client_id);
+create index if not exists idx_files_session on public.hubspot_agent_generated_files(session_id);
 create unique index if not exists uniq_files_session_template
-  on public.generated_files(session_id, prompt_template_id);
-create index if not exists idx_logs_session on public.generation_logs(session_id);
-create index if not exists idx_checks_client on public.validation_checks(client_id);
+  on public.hubspot_agent_generated_files(session_id, prompt_template_id);
+create index if not exists idx_logs_session on public.hubspot_agent_generation_logs(session_id);
+create index if not exists idx_checks_client on public.hubspot_agent_validation_checks(client_id);
 
 -- =========================================
 -- Updated_at trigger
@@ -122,20 +122,20 @@ begin
 end;
 $$ language plpgsql;
 
-drop trigger if exists trg_clients_updated on public.clients;
-create trigger trg_clients_updated before update on public.clients
+drop trigger if exists trg_clients_updated on public.hubspot_agent_clients;
+create trigger trg_clients_updated before update on public.hubspot_agent_clients
   for each row execute function public.set_updated_at();
 
-drop trigger if exists trg_sessions_updated on public.wizard_sessions;
-create trigger trg_sessions_updated before update on public.wizard_sessions
+drop trigger if exists trg_sessions_updated on public.hubspot_agent_wizard_sessions;
+create trigger trg_sessions_updated before update on public.hubspot_agent_wizard_sessions
   for each row execute function public.set_updated_at();
 
-drop trigger if exists trg_files_updated on public.generated_files;
-create trigger trg_files_updated before update on public.generated_files
+drop trigger if exists trg_files_updated on public.hubspot_agent_generated_files;
+create trigger trg_files_updated before update on public.hubspot_agent_generated_files
   for each row execute function public.set_updated_at();
 
-drop trigger if exists trg_prompts_updated on public.prompt_templates;
-create trigger trg_prompts_updated before update on public.prompt_templates
+drop trigger if exists trg_prompts_updated on public.hubspot_agent_prompt_templates;
+create trigger trg_prompts_updated before update on public.hubspot_agent_prompt_templates
   for each row execute function public.set_updated_at();
 
 -- =========================================
@@ -144,72 +144,72 @@ create trigger trg_prompts_updated before update on public.prompt_templates
 
 create or replace function public.current_team_id()
 returns uuid as $$
-  select team_id from public.user_profiles where id = auth.uid();
+  select team_id from public.hubspot_agent_profiles where id = auth.uid();
 $$ language sql stable security definer;
 
 -- =========================================
 -- RLS
 -- =========================================
 
-alter table public.teams enable row level security;
-alter table public.user_profiles enable row level security;
-alter table public.clients enable row level security;
-alter table public.wizard_sessions enable row level security;
-alter table public.generated_files enable row level security;
-alter table public.prompt_templates enable row level security;
-alter table public.generation_logs enable row level security;
-alter table public.validation_checks enable row level security;
+alter table public.hubspot_agent_teams enable row level security;
+alter table public.hubspot_agent_profiles enable row level security;
+alter table public.hubspot_agent_clients enable row level security;
+alter table public.hubspot_agent_wizard_sessions enable row level security;
+alter table public.hubspot_agent_generated_files enable row level security;
+alter table public.hubspot_agent_prompt_templates enable row level security;
+alter table public.hubspot_agent_generation_logs enable row level security;
+alter table public.hubspot_agent_validation_checks enable row level security;
 
 -- Teams: members can read their team
-drop policy if exists "teams_select_member" on public.teams;
-create policy "teams_select_member" on public.teams
+drop policy if exists "teams_select_member" on public.hubspot_agent_teams;
+create policy "teams_select_member" on public.hubspot_agent_teams
   for select using (id = public.current_team_id());
 
 -- User profiles
-drop policy if exists "profiles_select_self_or_team" on public.user_profiles;
-create policy "profiles_select_self_or_team" on public.user_profiles
+drop policy if exists "profiles_select_self_or_team" on public.hubspot_agent_profiles;
+create policy "profiles_select_self_or_team" on public.hubspot_agent_profiles
   for select using (id = auth.uid() or team_id = public.current_team_id());
 
-drop policy if exists "profiles_update_self" on public.user_profiles;
-create policy "profiles_update_self" on public.user_profiles
+drop policy if exists "profiles_update_self" on public.hubspot_agent_profiles;
+create policy "profiles_update_self" on public.hubspot_agent_profiles
   for update using (id = auth.uid());
 
-drop policy if exists "profiles_insert_self" on public.user_profiles;
-create policy "profiles_insert_self" on public.user_profiles
+drop policy if exists "profiles_insert_self" on public.hubspot_agent_profiles;
+create policy "profiles_insert_self" on public.hubspot_agent_profiles
   for insert with check (id = auth.uid());
 
 -- Clients
-drop policy if exists "clients_team_all" on public.clients;
-create policy "clients_team_all" on public.clients
+drop policy if exists "clients_team_all" on public.hubspot_agent_clients;
+create policy "clients_team_all" on public.hubspot_agent_clients
   for all using (team_id = public.current_team_id())
   with check (team_id = public.current_team_id());
 
 -- Wizard sessions
-drop policy if exists "sessions_team_all" on public.wizard_sessions;
-create policy "sessions_team_all" on public.wizard_sessions
+drop policy if exists "sessions_team_all" on public.hubspot_agent_wizard_sessions;
+create policy "sessions_team_all" on public.hubspot_agent_wizard_sessions
   for all using (team_id = public.current_team_id())
   with check (team_id = public.current_team_id());
 
 -- Generated files
-drop policy if exists "files_team_all" on public.generated_files;
-create policy "files_team_all" on public.generated_files
+drop policy if exists "files_team_all" on public.hubspot_agent_generated_files;
+create policy "files_team_all" on public.hubspot_agent_generated_files
   for all using (team_id = public.current_team_id())
   with check (team_id = public.current_team_id());
 
 -- Prompt templates: read for all authenticated
-drop policy if exists "prompts_read_all" on public.prompt_templates;
-create policy "prompts_read_all" on public.prompt_templates
+drop policy if exists "prompts_read_all" on public.hubspot_agent_prompt_templates;
+create policy "prompts_read_all" on public.hubspot_agent_prompt_templates
   for select using (auth.role() = 'authenticated');
 
 -- Generation logs
-drop policy if exists "logs_team_all" on public.generation_logs;
-create policy "logs_team_all" on public.generation_logs
+drop policy if exists "logs_team_all" on public.hubspot_agent_generation_logs;
+create policy "logs_team_all" on public.hubspot_agent_generation_logs
   for all using (team_id = public.current_team_id())
   with check (team_id = public.current_team_id());
 
 -- Validation checks
-drop policy if exists "checks_team_all" on public.validation_checks;
-create policy "checks_team_all" on public.validation_checks
+drop policy if exists "checks_team_all" on public.hubspot_agent_validation_checks;
+create policy "checks_team_all" on public.hubspot_agent_validation_checks
   for all using (team_id = public.current_team_id())
   with check (team_id = public.current_team_id());
 

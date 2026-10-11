@@ -1,7 +1,7 @@
--- Seed prompt_templates with the 11 templates (master + 2.1 to 2.10)
+-- Seed hubspot_agent_prompt_templates with the 11 templates (master + 2.1 to 2.10)
 -- Uses dollar-quoted strings to avoid quote escaping issues.
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   'master',
   'blueprint',
@@ -116,7 +116,7 @@ preámbulo, sin markdown, sin comentarios:
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.1-faq-hub',
   'md',
@@ -172,7 +172,7 @@ Solo el archivo .md, sin preámbulo ni comentarios. Listo para descargar.
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.2-catalog',
   'csv',
@@ -204,7 +204,7 @@ Solo el CSV, primera fila como header, sin preámbulo.
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.3-pricing-policy',
   'md',
@@ -254,7 +254,7 @@ Solo el .md, sin preámbulo.
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.4-escalation-matrix',
   'md',
@@ -306,7 +306,7 @@ Solo el .md.
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.5-restrictions',
   'md',
@@ -354,7 +354,7 @@ Solo el .md.
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.6-lead-qualification',
   'md',
@@ -411,7 +411,7 @@ Solo el .md.
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.7-disqualification-messages',
   'md',
@@ -464,7 +464,7 @@ Solo el .md.
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.8-slas',
   'md',
@@ -515,7 +515,7 @@ Solo el .md.
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.9-glossary',
   'md',
@@ -560,7 +560,7 @@ Solo el .md.
 $PROMPT$
 );
 
-insert into public.prompt_templates (id, output_format, filename_pattern, version, content)
+insert into public.hubspot_agent_prompt_templates (id, output_format, filename_pattern, version, content)
 values (
   '2.10-short-answers',
   'csv',

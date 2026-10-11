@@ -30,7 +30,7 @@ interface WizardState {
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
 async function persistSession(sessionId: string, patch: Record<string, unknown>) {
-  await supabase.from("wizard_sessions").update(patch).eq("id", sessionId);
+  await supabase.from("hubspot_agent_wizard_sessions").update(patch).eq("id", sessionId);
 }
 
 function scheduleSave(sessionId: string, patch: Record<string, unknown>) {

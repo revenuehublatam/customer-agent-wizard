@@ -54,7 +54,7 @@ export function Step1_ClientIdentification({ onNext }: Step1Props) {
     updateFormData(values);
     if (clientId) {
       await supabase
-        .from("clients")
+        .from("hubspot_agent_clients")
         .update({
           name: values.client_name,
           industry: values.industry,

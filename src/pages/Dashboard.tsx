@@ -23,7 +23,7 @@ export default function Dashboard() {
 
   const loadClients = async () => {
     const { data } = await supabase
-      .from("clients")
+      .from("hubspot_agent_clients")
       .select("*")
       .order("updated_at", { ascending: false });
     if (data) setClients(data as unknown as Client[]);
@@ -36,7 +36,7 @@ export default function Dashboard() {
   const ensureProfile = async () => {
     if (!user) return null;
     const { data: profile } = await supabase
-      .from("user_profiles")
+      .from("hubspot_agent_profiles")
       .select("team_id")
       .eq("id", user.id)
       .maybeSingle();
@@ -44,13 +44,13 @@ export default function Dashboard() {
     if (profile?.team_id) return profile.team_id;
 
     const { data: team } = await supabase
-      .from("teams")
+      .from("hubspot_agent_teams")
       .insert({ name: user.email ?? "Mi equipo" })
       .select()
       .single();
     if (!team) throw new Error("could not create team");
 
-    await supabase.from("user_profiles").upsert({
+    await supabase.from("hubspot_agent_profiles").upsert({
       id: user.id,
       team_id: team.id,
       role: "owner",
@@ -65,7 +65,7 @@ export default function Dashboard() {
       const teamId = await ensureProfile();
       if (!teamId) throw new Error("team missing");
       const { data, error } = await supabase
-        .from("clients")
+        .from("hubspot_agent_clients")
         .insert({
           team_id: teamId,
           name: newName,
